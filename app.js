@@ -44,6 +44,7 @@ const handleMessage = (event) => {
 const handleTextMessage = (event) => {
     typingOn(event.sender.id);
     sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
+    sendMessage(getTemplateMessage(getButtonPayload('Promp', [getButton('url', 'Analkuler', 'https://google.com')])))
 };
 
 const getTextMessage = (text) => {
@@ -56,6 +57,35 @@ const sendMessageBlock = () => {
 
 const typingOn = (senderId) => {
     sendAction('typing_on', senderId)
+};
+
+const getPostbackButton = (title, payload) => {
+    return getButton('postback', title, payload);
+};
+
+const getButton = (type, title, payload) => {
+    return {
+        type: type,
+        title: title,
+        payload: payload
+    }
+};
+
+const getButtonPayload = (text, buttons) => {
+    return {
+        template_type: 'button',
+        text: text,
+        buttons: buttons
+    }
+};
+
+const getTemplateMessage = (payload) => {
+    return {
+        attachment: {
+            type: 'template',
+            payload: payload
+        }
+    }
 };
 
 const sendMessage = (messageObject, senderId) => {
