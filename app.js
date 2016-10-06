@@ -46,11 +46,12 @@ const handleTextMessage = (event) => {
     typingOn(event.sender.id);
     sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
     sendMessage(getTemplateMessage(getButtonPayload('Promp eller analkuler?',
-        [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', 'PROMP')])), event.sender.id);
+        [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', JSON.stringify({type: 'PROMP'}))])), event.sender.id);
 };
 
 const handlePostbackMessage = (event) => {
-    switch (event.postback.payload) {
+    let payloadObject = JSON.parse(event.postback.payload);
+    switch (payloadObject.type) {
         case 'PROMP':
             sendMessage(getTextMessage('Promp fra postback'), event.sender.id);
             break;
