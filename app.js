@@ -55,7 +55,7 @@ const sendMessageBlock = () => {
 };
 
 const typingOn = (senderId) => {
-    sendAction({sender_action: 'typing_on'}, senderId)
+    sendAction('typing_on', senderId)
 };
 
 const sendMessage = (messageObject, senderId) => {
@@ -76,14 +76,14 @@ const sendMessage = (messageObject, senderId) => {
     });
 };
 
-const sendAction = (actionObject, senderId) => {
+const sendAction = (actionString, senderId) => {
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
         qs: {access_token: process.env.PAGE_TOKEN},
         method: 'POST',
         json: {
             recipient: {id: senderId},
-            message: actionObject,
+            sender_action: actionString,
         }
     }, (error, response, body) => {
         if (error) {
