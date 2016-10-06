@@ -45,6 +45,14 @@ const handleMessage = (event) => {
     }
 };
 
+const handleShowAllPostback = (payloadObject, senderId) => {
+    getDifiResponse(payloadObject.query)
+        .then(
+            data => handleDifiResponse(data, payloadObject.query, senderId, true),
+            error => console.log(error)
+        );
+};
+
 const handleTextMessage = (event) => {
     let text = event.message.text;
     let senderId = event.sender.id;
@@ -56,21 +64,25 @@ const handleTextMessage = (event) => {
      */
     getDifiResponse(text)
         .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
-
-
 };
 
-const handleDifiResponse = (difiResponse, query, senderId) => {
+const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
     let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
     if (uniqueEntries.length === 0) {
         sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
+    } else if (showAll === true) {
+        _.each(uniqueEntries, entry => sendMessage(getMessageFromEntry(entry), senderId));
     } else if (uniqueEntries.length <= 5) {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
     } else {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
         sendMessage(getTemplateMessage(getButtonPayload(`Fant ${uniqueEntries.length - 5} flere treff.`,
-            [getPostbackButton("Klikk for å se", JSON.stringify({type: 'PROMP'}))])), senderId)
+            [getPostbackButton("Klikk for å se", getShowAllResultsPostbackPayload(query))])), senderId)
     }
+};
+
+const getShowAllResultsPostbackPayload = (query) => {
+    return JSON.stringify({type: 'SHOW_ALL', query: query});
 };
 
 const getMoreRestaurantsMessage = (uniqueEntries, query) => {
@@ -102,6 +114,9 @@ const handlePostbackMessage = (event) => {
     switch (payloadObject.type) {
         case 'PROMP':
             sendMessage(getTextMessage('Promp fra postback'), event.sender.id);
+            break;
+        case 'SHOW_ALL':
+            handleShowAllPostback(JSON.parse(payloadObject), event.sender.id);
             break;
         default:
             console.log("What the fuck are ya doin?");
