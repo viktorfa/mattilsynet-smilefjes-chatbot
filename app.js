@@ -63,7 +63,7 @@ const handleTextMessage = (event) => {
 const handleDifiResponse = (difiResponse, query, senderId) => {
     let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
     if (uniqueEntries.length === 0) {
-        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`, senderId));
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
     } else if (uniqueEntries.length <= 5) {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
     } else {
