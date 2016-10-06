@@ -43,7 +43,7 @@ const handleMessage = (event) => {
 
 const handleTextMessage = (event) => {
     typingOn(event.sender.id);
-    //sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
+    sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
 };
 
 const getTextMessage = (text) => {
