@@ -70,7 +70,7 @@ const handleDifiResponse = (difiResponse, query, senderId) => {
 };
 
 const getMessageFromEntry = (entry) => {
-    return getTextMessage(getAssessmentString(entry.total_karakter));
+    return getTextMessage(`${entry.navn} sin karakter av Mattilsynet er ${getAssessmentString(entry.total_karakter)}`);
 };
 
 const getAssessmentString = (grade) => {
