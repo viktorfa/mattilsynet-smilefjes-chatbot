@@ -63,10 +63,19 @@ const handleTextMessage = (event) => {
 const handleDifiResponse = (difiResponse, query, senderId) => {
     let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
     if (uniqueEntries.length === 0) {
-        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`))
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`));
     } else if (uniqueEntries.length <= 5) {
-        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId))
+        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
+    } else {
+        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
+        sendMessage(`Fant ${uniqueEntries.length - 5} flere treff.`, senderId);
+        sendMessage(getTemplateMessage(getButtonPayload("Menu tror jeg",
+            [getPostbackButton("Klikk her for å se dem", JSON.stringify({type: 'PROMP'}))])), senderId)
     }
+};
+
+const getMoreRestaurantsMessage = (uniqueEntries, query) => {
+
 };
 
 const getMessageFromEntry = (entry) => {
