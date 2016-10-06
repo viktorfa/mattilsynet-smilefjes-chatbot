@@ -116,7 +116,7 @@ const handlePostbackMessage = (event) => {
             sendMessage(getTextMessage('Promp fra postback'), event.sender.id);
             break;
         case 'SHOW_ALL':
-            handleShowAllPostback(JSON.parse(payloadObject), event.sender.id);
+            handleShowAllPostback(payloadObject, event.sender.id);
             break;
         default:
             console.log("What the fuck are ya doin?");
