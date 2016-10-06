@@ -63,14 +63,13 @@ const handleTextMessage = (event) => {
 const handleDifiResponse = (difiResponse, query, senderId) => {
     let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
     if (uniqueEntries.length === 0) {
-        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`));
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`, senderId));
     } else if (uniqueEntries.length <= 5) {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
     } else {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
-        sendMessage(`Fant ${uniqueEntries.length - 5} flere treff.`, senderId);
-        sendMessage(getTemplateMessage(getButtonPayload("Menu tror jeg",
-            [getPostbackButton("Klikk her for å se dem", JSON.stringify({type: 'PROMP'}))])), senderId)
+        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${uniqueEntries.length - 5} flere treff.`,
+            [getPostbackButton("Klikk for å se", JSON.stringify({type: 'PROMP'}))])), senderId)
     }
 };
 
