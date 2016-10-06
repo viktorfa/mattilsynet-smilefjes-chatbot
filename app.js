@@ -8,6 +8,9 @@ const request = require('request');
 
 let app = express();
 const PORT = process.env.PORT || 3000;
+
+const DIFIURL = 'http://hotell.difi.no/api/json/mattilsynet/smilefjes/tilsyn?query=';
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -43,10 +46,47 @@ const handleMessage = (event) => {
 };
 
 const handleTextMessage = (event) => {
+    let text = event.message.text;
+    let senderId = event.sender.id;
+    sendMessage(getTextMessage(`Søker etter "${text}"`), senderId);
     typingOn(event.sender.id);
-    sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
-    sendMessage(getTemplateMessage(getButtonPayload('Promp eller analkuler?',
-        [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', JSON.stringify({type: 'PROMP'}))])), event.sender.id);
+    /*
+     sendMessage(getTemplateMessage(getButtonPayload('Promp eller analkuler?',
+     [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', JSON.stringify({type: 'PROMP'}))])), event.sender.id);
+     */
+    getDifiResponse(text)
+        .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
+
+
+};
+
+const handleDifiResponse = (difiResponse, query, senderId) => {
+    let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
+    if (uniqueEntries.length === 0) {
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`))
+    } else if (uniqueEntries.length <= 5) {
+        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId))
+    }
+};
+
+const getMessageFromEntry = (entry) => {
+    return getTextMessage(getAssessmentString(entry.total_karakter));
+};
+
+const getAssessmentString = (grade) => {
+    switch (grade) {
+        case '0':
+            return 'dårlig :(';
+            break;
+        case '1':
+            return 'middels :|';
+            break;
+        case '2':
+            return 'bra :)';
+            break;
+        default:
+            return 'ukjent';
+    }
 };
 
 const handlePostbackMessage = (event) => {
@@ -58,6 +98,29 @@ const handlePostbackMessage = (event) => {
         default:
             console.log("What the fuck are ya doin?");
     }
+};
+
+const getDifiResponse = (query) => {
+    return new Promise((resolve, reject) => {
+        request({
+            url: getDifiUrl(query),
+            method: 'GET',
+        }, (error, response, body) => {
+            if (error) {
+                console.log('Error sending messages: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(response.body.error);
+            } else {
+                resolve(JSON.parse(response.body));
+            }
+        })
+    })
+};
+
+const getDifiUrl = (query) => {
+    return `${DIFIURL}${query.replace(' ', '%20')}`;
 };
 
 const getTextMessage = (text) => {
