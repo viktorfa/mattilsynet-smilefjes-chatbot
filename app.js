@@ -35,16 +35,28 @@ app.post('/webhook/', function (req, res) {
 });
 
 const handleMessage = (event) => {
-    let sender = event.sender.id;
     if (isTextMessage(event)) {
         handleTextMessage(event);
+    } else if (isPostbackMessage(event)) {
+        handlePostbackMessage(event);
     }
 };
 
 const handleTextMessage = (event) => {
     typingOn(event.sender.id);
     sendMessage(getTextMessage('Spraydiaré'), event.sender.id);
-    sendMessage(getTemplateMessage(getButtonPayload('Promp', [getWebUrlButton('Analkuler', 'https://google.com')])), event.sender.id);
+    sendMessage(getTemplateMessage(getButtonPayload('Promp eller analkuler?',
+        [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', 'PROMP')])), event.sender.id);
+};
+
+const handlePostbackMessage = (event) => {
+    switch (event.postback.payload) {
+        case 'PROMP':
+            sendMessage(getTextMessage('Promp fra postback'), event.sender.id);
+            break;
+        default:
+            console.log("What the fuck are ya doin?");
+    }
 };
 
 const getTextMessage = (text) => {
@@ -130,6 +142,10 @@ const sendAction = (actionString, senderId) => {
 
 const isTextMessage = (event) => {
     return event.message && event.message.text;
+};
+
+const isPostbackMessage = (event) => {
+    return event.postback && event.postback.payload;
 };
 
 http.createServer(app).listen(PORT);
