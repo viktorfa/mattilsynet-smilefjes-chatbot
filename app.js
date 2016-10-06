@@ -60,19 +60,19 @@ const typingOn = (senderId) => {
 };
 
 const getPostbackButton = (title, payload) => {
-    return getButton('postback', title, {payload: payload});
+    return {
+        type: 'postback',
+        title: title,
+        payload: payload
+    };
 };
 
 const getWebUrlButton = (title, url) => {
-    return getButton('web_url', title, {url: url});
-};
-
-const getButton = (type, title, payload) => {
     return {
-        type: type,
+        type: 'web_url',
         title: title,
-        payload
-    }
+        url: url
+    };
 };
 
 const getButtonPayload = (text, buttons) => {
