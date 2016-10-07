@@ -58,10 +58,6 @@ const handleTextMessage = (event) => {
     let senderId = event.sender.id;
     sendMessage(getTextMessage(`Søker etter "${text}"`), senderId);
     typingOn(event.sender.id);
-    /*
-     sendMessage(getTemplateMessage(getButtonPayload('Promp eller analkuler?',
-     [getWebUrlButton('Analkuler', 'https://google.com'), getPostbackButton('Promp', JSON.stringify({type: 'PROMP'}))])), event.sender.id);
-     */
     getDifiResponse(text)
         .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
 };
@@ -77,16 +73,12 @@ const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
     } else {
         _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
         sendMessage(getTemplateMessage(getButtonPayload(`Fant ${uniqueEntries.length - 5} flere treff.`,
-            [getPostbackButton("Klikk for å se", getShowAllResultsPostbackPayload(query))])), senderId)
+            [getPostbackButton("Vis alle", getShowAllResultsPostbackPayload(query))])), senderId)
     }
 };
 
 const getShowAllResultsPostbackPayload = (query) => {
     return JSON.stringify({type: 'SHOW_ALL', query: query});
-};
-
-const getMoreRestaurantsMessage = (uniqueEntries, query) => {
-
 };
 
 const getMessageFromEntry = (entry) => {
@@ -148,10 +140,6 @@ const getDifiUrl = (query) => {
 
 const getTextMessage = (text) => {
     return {text: text};
-};
-
-const sendMessageBlock = () => {
-
 };
 
 const typingOn = (senderId) => {
