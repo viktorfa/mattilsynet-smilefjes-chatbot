@@ -62,8 +62,27 @@ const handleTextMessage = (event) => {
         .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
 };
 
+const getLatestAndUnique = (entries) => {
+    const groupedEntries = _.groupBy(entries, 'orgnummer');
+    return _.reduce(groupedEntries, (acc, value, key) => {
+        acc.push(_.last(value.sort(orderByDate)));
+        return acc;
+    }, []);
+};
+
+const orderByDate = (a, b) => {
+    if (Number.parseInt(a.dato.substring(4, 8)) < Number.parseInt(b.dato.substring(4, 8))) {
+        return -1;
+    } else if (Number.parseInt(a.dato.substring(2, 4)) < Number.parseInt(b.dato.substring(2, 4))) {
+        return -1;
+    } else {
+        return Number.parseInt(a.dato.substring(0, 2)) - Number.parseInt(b.dato.substring(0, 2))
+    }
+};
+
+
 const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
-    let uniqueEntries = _.uniqBy(difiResponse.entries, 'navn');
+    let uniqueEntries = getLatestAndUnique(difiResponse.entries);
     if (uniqueEntries.length === 0) {
         sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
     } else if (showAll === true) {
