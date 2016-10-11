@@ -48,7 +48,7 @@ const handleMessage = (event) => {
 const handleShowAllPostback = (payloadObject, senderId) => {
     getDifiResponse(payloadObject.query)
         .then(
-            data => handleDifiResponse2(data, payloadObject.query, senderId, true),
+            data => handleDifiResponse(data, payloadObject.query, senderId, true),
             error => console.log(error)
         );
 };
@@ -62,13 +62,6 @@ const handleTextMessage = (event) => {
         .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
 };
 
-const getLatestAndUnique = (entries) => {
-    const groupedEntries = _.groupBy(entries, 'orgnummer');
-    return _.reduce(groupedEntries, (acc, value, key) => {
-        acc.push(_.last(value.sort(orderByDate)));
-        return acc;
-    }, []);
-};
 
 const orderByDate = (a, b) => {
     if (Number.parseInt(a.dato.substring(4, 8)) < Number.parseInt(b.dato.substring(4, 8))) {
@@ -82,21 +75,6 @@ const orderByDate = (a, b) => {
 
 
 const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
-    let uniqueEntries = getLatestAndUnique(difiResponse.entries);
-    if (uniqueEntries.length === 0) {
-        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
-    } else if (showAll === true) {
-        _.each(uniqueEntries, entry => sendMessage(getMessageFromEntry(entry), senderId));
-    } else if (uniqueEntries.length <= 5) {
-        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
-    } else {
-        _.each(_.take(uniqueEntries, 5), entry => sendMessage(getMessageFromEntry(entry), senderId));
-        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${uniqueEntries.length - 5} flere treff.`,
-            [getPostbackButton("Vis alle", getShowAllResultsPostbackPayload(query))])), senderId)
-    }
-};
-
-const handleDifiResponse2 = (difiResponse, query, senderId, showAll) => {
     const groupedEntries = _.groupBy(difiResponse.entries, 'orgnummer');
     sendMessage('grouped entries');
     sendMessage(groupedEntries);
@@ -122,11 +100,8 @@ const getShowAllResultsPostbackPayload = (query) => {
     return JSON.stringify({type: 'SHOW_ALL', query: query});
 };
 
-const getMessageFromEntry = (entry) => {
-    return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) har fått vurdering ${getAssessmentString(entry.total_karakter)} (${getFormattedDate(entry.dato)})`);
-};
-
 const getMessageFromEntryList = (entryList) => {
+    entryList = entryList.sort(orderByDate);
     const latestEntry = _.nth(entryList, -1);
     const nextEntry = _.nth(entryList, -2);
     let result = `${latestEntry.navn} (${_.capitalize(latestEntry.poststed)}) har fått vurdering ${getAssessmentString(latestEntry.total_karakter)} (${getFormattedDate(latestEntry.dato)})`;
