@@ -101,7 +101,7 @@ const getShowAllResultsPostbackPayload = (query) => {
 };
 
 const getMessageFromEntry = (entry) => {
-    return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) sin karakter av Mattilsynet er ${getAssessmentString(entry.total_karakter)}`);
+    return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) har fått vurdering ${getAssessmentString(entry.total_karakter)}`);
 };
 
 const getAssessmentString = (grade) => {
