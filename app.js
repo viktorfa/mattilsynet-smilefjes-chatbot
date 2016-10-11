@@ -101,7 +101,11 @@ const getShowAllResultsPostbackPayload = (query) => {
 };
 
 const getMessageFromEntry = (entry) => {
-    return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) har fått vurdering ${getAssessmentString(entry.total_karakter)}`);
+    return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) har fått vurdering ${getAssessmentString(entry.total_karakter)} (${getFormattedDate(entry.dato)})`);
+};
+
+const getFormattedDate = (dateString) => {
+    return `${dateString.substring(0, 2)}.${dateString.substring(2, 4)}.${dateString.substring(4, 8)}`
 };
 
 const getAssessmentString = (grade) => {
