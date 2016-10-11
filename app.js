@@ -129,11 +129,11 @@ const getMessageFromEntry = (entry) => {
 const getMessageFromEntryList = (entryList) => {
     const latestEntry = _.nth(entryList, -1);
     const nextEntry = _.nth(entryList, -2);
-    let result = getTextMessage(`${latestEntry.navn} (${_.capitalize(latestEntry.poststed)}) har fått vurdering ${getAssessmentString(latestEntry.total_karakter)} (${getFormattedDate(latestEntry.dato)})`);
+    let result = `${latestEntry.navn} (${_.capitalize(latestEntry.poststed)}) har fått vurdering ${getAssessmentString(latestEntry.total_karakter)} (${getFormattedDate(latestEntry.dato)})`;
     if (!_.isUndefined(nextEntry)) {
         result += ` og ${getAssessmentString(nextEntry.total_karakter)} (${getFormattedDate(nextEntry.dato)})`;
     }
-    return result;
+    return getTextMessage(result);
 };
 const getFormattedDate = (dateString) => {
     return `${dateString.substring(0, 2)}.${dateString.substring(2, 4)}.${dateString.substring(4, 8)}`
