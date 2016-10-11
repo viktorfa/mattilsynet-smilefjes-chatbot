@@ -88,13 +88,16 @@ const getMessageFromEntry = (entry) => {
 const getAssessmentString = (grade) => {
     switch (grade) {
         case '0':
-            return 'dårlig :(';
+            return 'bra :)';
             break;
         case '1':
-            return 'middels :|';
+            return 'bra :)';
             break;
         case '2':
-            return 'bra :)';
+            return 'middels :|';
+            break;
+        case '3':
+            return 'dårlig :(';
             break;
         default:
             return 'ukjent';
