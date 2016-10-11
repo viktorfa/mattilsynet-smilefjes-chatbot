@@ -96,6 +96,21 @@ const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
     }
 };
 
+const handleDifiResponse2 = (difiResponse, query, senderId, showAll) => {
+    const groupedEntries = _.groupBy(difiResponse.entries, 'orgnummer');
+    if (groupedEntries.length === 0) {
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
+    } else if (showAll === true) {
+        _.each(groupedEntries, entry => sendMessage(getMessageFromEntryList(entry), senderId));
+    } else if (groupedEntries.length <= 5) {
+        _.each(_.take(groupedEntries, 5), entry => sendMessage(getMessageFromEntryList(entry), senderId));
+    } else {
+        _.each(_.take(groupedEntries, 5), entry => sendMessage(getMessageFromEntryList(entry), senderId));
+        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${groupedEntries.length - 5} flere treff.`,
+            [getPostbackButton("Vis alle", getShowAllResultsPostbackPayload(query))])), senderId)
+    }
+};
+
 const getShowAllResultsPostbackPayload = (query) => {
     return JSON.stringify({type: 'SHOW_ALL', query: query});
 };
@@ -104,6 +119,15 @@ const getMessageFromEntry = (entry) => {
     return getTextMessage(`${entry.navn} (${_.capitalize(entry.poststed)}) har fått vurdering ${getAssessmentString(entry.total_karakter)} (${getFormattedDate(entry.dato)})`);
 };
 
+const getMessageFromEntryList = (entryList) => {
+    const latestEntry = _.nth(entryList, -1);
+    const nextEntry = _.nth(entryList, -2);
+    let result = getTextMessage(`${latestEntry.navn} (${_.capitalize(latestEntry.poststed)}) har fått vurdering ${getAssessmentString(latestEntry.total_karakter)} (${getFormattedDate(latestEntry.dato)})`);
+    if (!_.isUndefined(nextEntry)) {
+        result += ` og ${getAssessmentString(nextEntry.total_karakter)} (${getFormattedDate(nextEntry.dato)})`;
+    }
+    return result;
+};
 const getFormattedDate = (dateString) => {
     return `${dateString.substring(0, 2)}.${dateString.substring(2, 4)}.${dateString.substring(4, 8)}`
 };
