@@ -98,20 +98,20 @@ const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
 
 const handleDifiResponse2 = (difiResponse, query, senderId, showAll) => {
     const groupedEntries = _.groupBy(difiResponse.entries, 'orgnummer');
-    console.log('grouped entries');
-    console.log(groupedEntries);
+    sendMessage('grouped entries');
+    sendMessage(groupedEntries);
     const length = Object.keys(groupedEntries).length;
-    console.log(length);
+    sendMessage(length);
     if (length === 0) {
-        console.log(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
+        sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
     } else if (showAll === true) {
-        _.each(groupedEntries, entry => console.log(getMessageFromEntryList(entry), senderId));
+        _.each(groupedEntries, entry => sendMessage(getMessageFromEntryList(entry), senderId));
     } else if (length <= 5) {
-        _.each(groupedEntries, entry => console.log(getMessageFromEntryList(entry), senderId));
+        _.each(groupedEntries, entry => sendMessage(getMessageFromEntryList(entry), senderId));
     } else {
         let count = 0;
-        _.some(groupedEntries, entry => console.log(getMessageFromEntryList(entry), senderId));
-        console.log(getTemplateMessage(getButtonPayload(`Fant ${length - 5} flere treff.`,
+        _.some(groupedEntries, entry => sendMessage(getMessageFromEntryList(entry), senderId));
+        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${length - 5} flere treff.`,
             [getPostbackButton("Vis alle", getShowAllResultsPostbackPayload(query))])), senderId);
         count++;
         return count >= 5;
