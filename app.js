@@ -48,7 +48,7 @@ const handleMessage = (event) => {
 const handleShowAllPostback = (payloadObject, senderId) => {
     getDifiResponse(payloadObject.query)
         .then(
-            data => handleDifiResponse(data, payloadObject.query, senderId, true),
+            data => handleDifiResponse2(data, payloadObject.query, senderId, true),
             error => console.log(error)
         );
 };
@@ -98,15 +98,16 @@ const handleDifiResponse = (difiResponse, query, senderId, showAll) => {
 
 const handleDifiResponse2 = (difiResponse, query, senderId, showAll) => {
     const groupedEntries = _.groupBy(difiResponse.entries, 'orgnummer');
-    if (groupedEntries.length === 0) {
+    const length = Object.keys(groupedEntries).length;
+    if (length === 0) {
         sendMessage(getTextMessage(`Fant ingen treff på "${query}"`), senderId);
     } else if (showAll === true) {
         _.each(groupedEntries, entry => sendMessage(getMessageFromEntryList(entry), senderId));
-    } else if (groupedEntries.length <= 5) {
+    } else if (length <= 5) {
         _.each(_.take(groupedEntries, 5), entry => sendMessage(getMessageFromEntryList(entry), senderId));
     } else {
         _.each(_.take(groupedEntries, 5), entry => sendMessage(getMessageFromEntryList(entry), senderId));
-        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${groupedEntries.length - 5} flere treff.`,
+        sendMessage(getTemplateMessage(getButtonPayload(`Fant ${length - 5} flere treff.`,
             [getPostbackButton("Vis alle", getShowAllResultsPostbackPayload(query))])), senderId)
     }
 };
