@@ -48,7 +48,7 @@ const handleMessage = (event) => {
 const handleShowAllPostback = (payloadObject, senderId) => {
     getDifiResponse(payloadObject.query)
         .then(
-            data => handleDifiResponse2(data, payloadObject.query, senderId, true),
+            data => handleDifiResponse(data, payloadObject.query, senderId, true),
             error => console.log(error)
         );
 };
@@ -59,7 +59,7 @@ const handleTextMessage = (event) => {
     sendMessage(getTextMessage(`Søker etter "${text}"`), senderId);
     typingOn(event.sender.id);
     getDifiResponse(text)
-        .then(data => handleDifiResponse2(data, text, senderId), error => console.log(error));
+        .then(data => handleDifiResponse(data, text, senderId), error => console.log(error));
 };
 
 const getLatestAndUnique = (entries) => {
